@@ -21,7 +21,7 @@ function saveEvent(event) {
     //Text saves to page on reload and targets specific HOUR of calendar
     var clickedButton = $(event.target);
     var hour = clickedButton.attr("id");
-    var textValue = clickedButton.siblings("textarea").val();
+    var textValue = clickedButton.parent().siblings("textarea").val();
     userEvents[hour] = textValue;
     localStorage.setItem("userEvents", JSON.stringify(userEvents));
 }
@@ -41,27 +41,32 @@ function generateRow(rowIndex, currentHour) {
     }
 
     var form = $("<textarea></textarea");
+    form.addClass("col-9");
+    //References any given text content that has been saved to a row
     form.text(userEvents[rowIndex]);
 
     var time = $("<div></div>");
-    time.addClass("hour");
-    
-    var saveBtn = $("<button></button>");
-    saveBtn.text("Save");
-    saveBtn.addClass("saveBtn");
-    saveBtn.attr("id", rowIndex);
+    time.addClass("hour col-2");
+
+    //Styles SAVE button icon within container
+    var buttonContainer = $("<div></div>");
+    buttonContainer.addClass("saveBtn col-1");
+    var saveIcon = $("<i></i>");
+    buttonContainer.append(saveIcon);
+    saveIcon.addClass("fas fa-save");
+    saveIcon.attr("id", rowIndex);
 
     //Appends ROW, TEXTAREA, and HOUR divs to TIME-BLOCK div
     var timeBlock = $("#time-block");
     timeBlock.append(row);
     row.append(time);
     row.append(form);
-    row.append(saveBtn);
+    row.append(buttonContainer);
     //Adds hour to HOUR div
     time.text(`${rowIndex}:00`);
    
     //Adds function to 'save' button
-    saveBtn.on("click", saveEvent);
+    saveIcon.on("click", saveEvent);
 }
 
 //Generates work times from 0900 to 1700
