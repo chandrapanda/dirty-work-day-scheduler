@@ -1,8 +1,8 @@
 console.log("Oh hey there");
 //Global variables
-var today = document.getElementById("currentDay");
+var today = $("#currentDay");
 var localStoredEvents = localStorage.getItem("userEvents");
-
+var userEvents;
 //If no events are present in local storage, sets userEvents to empty object
 if (!localStoredEvents) {
     userEvents = {};
@@ -11,67 +11,57 @@ if (!localStoredEvents) {
 }
 
 //Displays the current date on the page
-today.textContent += moment().format('MMMM Do, YYYY');
+today.text(moment().format('MMMM Do, YYYY'));
+
 generateTimes();
 
 //Saves user input in calendar on reload
-function saveEvent() {
+function saveEvent(event) {
     console.log("Saved!");
-    //TODO: Make sure text saves to page on reload and targets specific HOUR of calendar
-    var userEvents =  
+    //Text saves to page on reload and targets specific HOUR of calendar
+    var clickedButton = $(event.target);
+    var hour = clickedButton.attr("id");
+    var textValue = clickedButton.siblings("textarea").val();
+    userEvents[hour] = textValue;
     localStorage.setItem("userEvents", JSON.stringify(userEvents));
-    
-}
-
-function getSavedEvent() {
-    if (!localStorage.getItem("userEvents")) {
-        return "";
-    }
-    return localStorage.getItem("userEvents");
 }
 
 //Generates single row of schedule on page
 function generateRow(rowIndex, currentHour) {
 
-    var row = document.createElement("div");
-    row.classList.add("row");
-    // console.log(rowIndex); 
-    // console.log(currentHour);
+    var row = $("<div></div>");
+    row.addClass("row");
+
     if (rowIndex === currentHour) {
-        row.classList.add("present");
+        row.addClass("present");
     } else if (rowIndex > currentHour) {
-        row.classList.add("future");
+        row.addClass("future");
     } else {
-        row.classList.add("past");
+        row.addClass("past");
     }
 
-    
-    var form = document.createElement("textarea");
-    form.setAttribute("id", "textArea"+rowIndex)
-    
-    let getTextAreaValue = localStorage.getItem("textarea"+rowIndex);
-    form.innerHTML = getTextAreaValue;
+    var form = $("<textarea></textarea");
+    form.text(userEvents[rowIndex]);
 
-    var time = document.createElement("div");
-    time.classList.add("hour");
-
-    var saveBtn = document.createElement("button");
-    saveBtn.textContent = "Save";
-    saveBtn.classList.add("saveBtn");
-    saveBtn.setAttribute("id", 'saveButton')
+    var time = $("<div></div>");
+    time.addClass("hour");
+    
+    var saveBtn = $("<button></button>");
+    saveBtn.text("Save");
+    saveBtn.addClass("saveBtn");
+    saveBtn.attr("id", rowIndex);
 
     //Appends ROW, TEXTAREA, and HOUR divs to TIME-BLOCK div
-    var timeBlock = document.getElementById("time-block");
-    timeBlock.appendChild(row);
-    row.appendChild(time);
-    row.appendChild(form);
-    row.appendChild(saveBtn);
-
+    var timeBlock = $("#time-block");
+    timeBlock.append(row);
+    row.append(time);
+    row.append(form);
+    row.append(saveBtn);
     //Adds hour to HOUR div
-    time.textContent = `${rowIndex}:00`;
+    time.text(`${rowIndex}:00`);
    
     //Adds function to 'save' button
-    saveBtn.addEventListener("click", saveEvent);
+    saveBtn.on("click", saveEvent);
 }
 
 //Generates work times from 0900 to 1700
