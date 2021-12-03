@@ -32,4 +32,5 @@ THEN the saved events persist
 
 ## Screenshots 
 
-
+![A user opens the page](./assets/scheduler1.png)
+![A user sets events and reloads the page.](./assets/scheduler2.png)
